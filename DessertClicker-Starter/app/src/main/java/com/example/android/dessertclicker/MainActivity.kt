@@ -25,11 +25,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
 import androidx.databinding.DataBindingUtil
 import com.example.android.dessertclicker.databinding.ActivityMainBinding
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
+    private val KEY_REVENUE = "revenue_key"
+    private val KEY_DESSERT_SOLD = "dessert_sold_key"
+    private val KEY_TIMER_SECONDS = "timer_seconds_key"
+
     private var revenue = 0
     private var dessertsSold = 0
+
+    private lateinit var dessertTimer: DessertTimer
 
     // Contains all the views
     private lateinit var binding: ActivityMainBinding
@@ -61,11 +68,37 @@ class MainActivity : AppCompatActivity() {
     )
     private var currentDessert = allDesserts[0]
 
+    override fun onStart() {
+        super.onStart()
+
+//        dessertTimer.startTimer()
+        Timber.i("onStart()")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        Timber.i("onSaveInstanceState")
+        outState.putInt(KEY_REVENUE, revenue)
+        outState.putInt(KEY_DESSERT_SOLD, dessertsSold)
+        outState.putInt(KEY_TIMER_SECONDS, dessertTimer.secondsCount)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.i("onCreate()")
 
         // Use Data Binding to get reference to the views
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        dessertTimer = DessertTimer(lifecycle)
+
+        savedInstanceState?.let {
+            revenue = it.getInt(KEY_REVENUE, 0)
+            dessertsSold = it.getInt(KEY_DESSERT_SOLD, 0)
+            dessertTimer.secondsCount = it.getInt(KEY_TIMER_SECONDS, 0)
+            showCurrentDessert()
+        }
 
         binding.dessertButton.setOnClickListener {
             onDessertClicked()
@@ -77,6 +110,13 @@ class MainActivity : AppCompatActivity() {
 
         // Make sure the correct dessert is showing
         binding.dessertButton.setImageResource(currentDessert.imageId)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+//        dessertTimer.stopTimer()
+        Timber.i("onStop()")
     }
 
     /**
