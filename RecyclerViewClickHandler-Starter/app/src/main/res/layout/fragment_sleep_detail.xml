@@ -22,6 +22,7 @@
  the whole ViewModel, so that we can access the LiveData,
  click handlers, and state variables. -->
     <data>
+
         <variable
             name="sleepDetailViewModel"
             type="com.example.android.trackmysleepquality.sleepdetail.SleepDetailViewModel" />
@@ -39,10 +40,10 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="56dp"
             android:layout_marginEnd="8dp"
-            app:sleepImage="@{sleepDetailViewModel.night}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:sleepImage="@{sleepDetailViewModel.night}" />
 
         <TextView
             android:id="@+id/quality_string"
