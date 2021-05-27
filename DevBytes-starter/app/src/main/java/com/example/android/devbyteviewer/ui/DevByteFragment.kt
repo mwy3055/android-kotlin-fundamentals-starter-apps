@@ -67,7 +67,7 @@ class DevByteFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.playlist.observe(viewLifecycleOwner, Observer<List<DevByteVideo>> { videos ->
+        viewModel.playlist.observe(viewLifecycleOwner, { videos ->
             videos?.apply {
                 viewModelAdapter?.videos = videos
             }
@@ -91,15 +91,14 @@ class DevByteFragment : Fragment() {
      * @return Return the View for the fragment's UI.
      */
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         val binding: FragmentDevByteBinding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.fragment_dev_byte,
                 container,
                 false)
         // Set the lifecycleOwner so DataBinding can observe LiveData
-        binding.setLifecycleOwner(viewLifecycleOwner)
-
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
         viewModelAdapter = DevByteAdapter(VideoClick {
@@ -124,9 +123,8 @@ class DevByteFragment : Fragment() {
             adapter = viewModelAdapter
         }
 
-
         // Observer for the network error.
-        viewModel.eventNetworkError.observe(viewLifecycleOwner, Observer<Boolean> { isNetworkError ->
+        viewModel.eventNetworkError.observe(viewLifecycleOwner, { isNetworkError ->
             if (isNetworkError) onNetworkError()
         })
 
@@ -169,7 +167,7 @@ class VideoClick(val block: (DevByteVideo) -> Unit) {
 /**
  * RecyclerView Adapter for setting up data binding on the items in the list.
  */
-class DevByteAdapter(val callback: VideoClick) : RecyclerView.Adapter<DevByteViewHolder>() {
+class DevByteAdapter(private val callback: VideoClick) : RecyclerView.Adapter<DevByteViewHolder>() {
 
     /**
      * The videos that our Adapter will show
