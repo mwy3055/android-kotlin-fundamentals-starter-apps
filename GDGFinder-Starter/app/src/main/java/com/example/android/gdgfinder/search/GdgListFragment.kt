@@ -27,8 +27,10 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.android.gdgfinder.R
 import com.example.android.gdgfinder.databinding.FragmentGdgListBinding
 import com.google.android.gms.location.*
+import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 
 private const val LOCATION_PERMISSION_REQUEST = 1
@@ -45,7 +47,7 @@ class GdgListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentGdgListBinding.inflate(inflater)
 
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
@@ -75,6 +77,22 @@ class GdgListFragment : Fragment() {
             })
 
         setHasOptionsMenu(true)
+
+        viewModel.regionList.observe(viewLifecycleOwner) { data ->
+            data ?: return@observe
+            val chipGroup = binding.regionList
+            val children = data.map { regionName ->
+                (inflater.inflate(R.layout.region, chipGroup, false) as Chip).apply {
+                    text = regionName
+                    tag = regionName
+                    setOnCheckedChangeListener { button, isChecked ->
+                        viewModel.onFilterChanged(button.tag as String, isChecked)
+                    }
+                }
+            }
+            chipGroup.removeAllViews()
+            children.forEach { chip -> chipGroup.addView(chip) }
+        }
         return binding.root
     }
 
